@@ -56,12 +56,9 @@ limitations under the License.
 
         $('#connect').hide();
         $('#load').hide();
-        $('#mediaCtrl').hide();
 
         window.apiInitialized = false;
         window.apiSession = null;
-        window.apiMedia = null;
-        window.showingHud = true;
 
         function setHudMessage(elementId, message) {
             $('#'+elementId).html('' + JSON.stringify(message));
@@ -83,111 +80,6 @@ limitations under the License.
         var onInitError = function(castError) {
             setHudMessage('api_status', "Initialize Error: " + JSON.stringify(castError));
             $('#api_status').addClass('error');
-        }
-
-        function loadMediaOntoReceiver() {
-            var url = $('#mediaurl').val();
-            var ext = url.split('.').pop();
-            var mime = 'unknown';
-            if(url !== ext) {
-                // has extension
-                mime = window.mimeTypes[ext]
-            }
-            var mediaInfo = new chrome.cast.media.MediaInfo(url, mime);
-            console.log("## MediaInfo('"+url+"', '"+mime+"')");
-            var loadRequest = new chrome.cast.media.LoadRequest(mediaInfo);
-            loadRequest.autoplay = $('#autoplay').prop('checked');
-
-            console.log('Sending Load Request: ')
-            console.log(loadRequest);
-
-            // Loads media into a running receiver application.
-            // This call will fail unless this session supports the namespace "urn:x-cast:chrome.cast.media".
-            window.apiSession.loadMedia(loadRequest,
-                function(media){ // Success
-                    // chrome.cast.media.Media object
-                    window.apiMedia = media;
-                    $('#mediaCtrl').show();
-                    console.log("Got media object");
-                    if(window.apiMedia.playerState === chrome.cast.media.PlayerState.PLAYING) {
-                        $('#playpause').html('PAUSE');
-                    } else {
-                        $('#playpause').html('PLAY');
-                    }
-                },
-                function(castError){
-                    console.error(''+JSON.stringify(castError));
-                });
-        }
-
-        var mediaUpdateListener = function(bool) {
-            if(window.apiMedia.playerState === chrome.cast.media.PlayerState.PLAYING){
-                console.log("Playing");
-            } else if(window.apiMedia.playerState === chrome.cast.media.PlayerState.PAUSED) {
-                console.log("Paused");
-            } else if(window.apiMedia.playerState === chrome.cast.media.PlayerState.IDLE) {
-                console.log("Idle");
-            } else if(window.apiMedia.playerState === chrome.cast.media.PlayerState.STOPPED) {
-                console.log("Stopped");
-            }
-        }
-
-        function sendPlayPause() {
-            if(window.apiMedia.playerState === chrome.cast.media.PlayerState.PLAYING) {
-                window.apiMedia.pause(new chrome.cast.media.PauseRequest(),
-                        function(){
-                            // successfully paused
-                            console.log("Successfully Paused");
-                            $('#playpause').html('PLAY');
-                        },
-                        function(castError){
-                            console.error(JSON.stringify(castError));
-                        });
-            } else {
-                window.apiMedia.play(new chrome.cast.media.PlayRequest(),
-                        function(){
-                            // successfully playing
-                            console.log("Successfully Playing");
-                            $('#playpause').html('PAUSE');
-                        },
-                        function(castError){
-                            console.error(JSON.stringify(castError));
-                        });
-            }
-        }
-
-        function sendStop() {
-            if(window.apiMedia &&
-                    (window.apiMedia.playerState === chrome.cast.media.PlayerState.PAUSED) ||
-                    (window.apiMedia.playerState === chrome.cast.media.PlayerState.PLAYING)){
-                window.apiMedia.stop(new chrome.cast.media.StopRequest(),
-                        function(){
-                            // successfully stopped
-                            $('#playpause').html('PLAY');
-                        },
-                        function(castError){
-                            console.error(JSON.stringify(castError));
-                        });
-            }
-        }
-
-        function volumeAdjust() {
-            var value = $('volume').val();
-            $('#vol_val').val(value);
-
-            var volume = new chrome.cast.Volume();
-            volume.level = value;
-            var currentVolume = volume.level;
-            volume.muted = $('#mute').prop('checked');
-            var request = new chrome.cast.media.VolumeRequest(volume);
-
-            window.apiMedia.setVolume(request,
-                    function(){
-                        // Success
-                    },
-                    function(castError){
-                        console.error("Error setting volume: " + JSON.stringify(castError));
-                    });
         }
 
         function sendcolors(messagenr, maxnr, timeout){
@@ -279,14 +171,6 @@ limitations under the License.
                     sessionJoinedListener,
                     receiverListener);
             chrome.cast.initialize(apiConfig, onInitSuccess, onInitError);
-        };
-
-
-        // -- You can ignore the following it is here for convenience only --
-        window.mimeTypes = {
-            'mov':'video/quicktime',
-            'mp4':'video/mp4',
-            'm3u8':'application/x-mpegURL'
         };
 
     </script>
