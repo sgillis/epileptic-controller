@@ -48,24 +48,8 @@ limitations under the License.
             <button onclick="initializeCastApi()">Perform Cast API Initialization</button>
         </div>
         <div id="connect">Connect To Receiver:
-            <button onclick="launchAppOnReceiver()">Perform Request Session</button></div>
-        <div id="load">Load Media URL:
-            <input id="mediaurl" type="text"/>
-            <button onclick="loadMediaOntoReceiver()">Perform Load Media</button>
-            <input type="checkbox" id="autoplay"/> Autoplay
-            <button onclick="showhideHud()">Show/Hide Receiver HUD</button>
+            <button onclick="launchAppOnReceiver()">Perform Request Session</button>
         </div>
-        <div id="mediaCtrl">Media Control:
-            <button id="playpause" onclick='sendPlayPause()'>Play</button>
-            <button onclick="sendStop()">Stop</button>
-
-            <div id="mediaVol">
-                Volume: <input onchange="volumeAdjust()" type="range" min="0.0" max="1.0" step="0.05" value="1.0" id="volume"/>
-                <input id="vol_val" type="text" disabled/>
-                <input type="checkbox" id="mute"/> Mute
-            </div>
-        </div>
-
     </div>
 
     <script type="text/javascript">
